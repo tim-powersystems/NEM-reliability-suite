@@ -14,7 +14,7 @@ using Dates
 #%% ================= Modelling demand flexibility ===============================
 
 simspec = SequentialMonteCarlo(samples=200, seed=110);
-respec = (Shortfall(), DemandResponseEnergy(),);
+respec = (Shortfall(),);
 tyear = 2030
 
 sf_res_dsp = zeros(Float64, 2, 1) # Store NEUE results for 4 different storage dispatches, 11 target years
@@ -34,8 +34,10 @@ sys = PRASNEM.create_pras_system(start_dt, end_dt, input_folder, timeseries_fold
 sys_without_dsp = PRASNEM.create_pras_system(start_dt, end_dt, input_folder, timeseries_folder; output_folder=output_folder, gentech_excluded=["DSP"])
 
 #%% Run PRAS with and without DSP
-sf_with_dsp, dr_energy = assess(sys, simspec, respec...);
-sf_without_dsp, _ = assess(sys_without_dsp, simspec, respec...);
+#sys = PRASNEM.remove_intraarea_constraints(sys; bus_file_path=joinpath(input_folder, "Bus.csv"))
+#sys_without_dsp = PRASNEM.remove_intraarea_constraints(sys_without_dsp; bus_file_path=joinpath(input_folder, "Bus.csv"))
+sf_with_dsp, = assess(sys, simspec, respec...);
+sf_without_dsp, = assess(sys_without_dsp, simspec, respec...);
 
 println("Year $tyear: Shortfall with DSP = $(NEUE(sf_with_dsp)) MWh, without DSP = $(NEUE(sf_without_dsp)) MWh")
 println("Without DSP:")
