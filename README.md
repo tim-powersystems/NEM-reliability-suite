@@ -23,7 +23,7 @@ Now we can start collecting the public ISP data with ```PISP```. Note that this 
 using PISP
 
 # Set some parameters (see all parameters below)
-reference_trace = 4006 
+reference_trace = 2011 #Use 4006 for the reference trace of the ODP. 
 poe = 10 # Probability of exceedance (POE) for demand
 target_years = [2030, 2031]
 
