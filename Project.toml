@@ -7,4 +7,9 @@ PISP = "0cf86302-bd88-49fb-82d1-7e27fc78d6eb"
 PRASNEM = "dd18fea1-acda-4cb9-9bf0-b27bbe00ccb1"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
-SchedNEM = "608957f4-5792-4b67-ab68-b9ace5c79cbf"
+SiennaNEM = "2b2140f2-b9c0-4054-8dfe-2e6bd74cbbbe"
+
+[sources]
+PISP = {url = "https://github.com/ARPST-UniMelb/PISP.jl"}
+PRASNEM = {url = "https://github.com/ARPST-UniMelb/PRASNEM.jl"}
+SiennaNEM = {url = "https://github.com/ARPST-UniMelb/SiennaNEM.jl"}
