@@ -89,7 +89,7 @@ SiennaNEM.add_ts!(
     sys_sienna, data;
     horizon       = horizon,  # horizon of each time slice that will be used in the study
     interval      = interval,  # interval within each time slice, not the resolution of the time series
-    scenario_name = scenario,  # scenario number
+    scenario_name = scenario,  # scenario number, integer
 );
 
 template_uc = SiennaNEM.build_problem_base_uc();
