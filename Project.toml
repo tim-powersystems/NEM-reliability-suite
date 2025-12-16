@@ -8,13 +8,14 @@ Measures = "442fdcdd-2543-5da2-b0f3-8c86c306513e"
 PISP = "0cf86302-bd88-49fb-82d1-7e27fc78d6eb"
 PRASNEM = "dd18fea1-acda-4cb9-9bf0-b27bbe00ccb1"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+PowerSimulations = "e690365d-45e2-57bb-ac84-44ba829e73c4"
 PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
 SiennaNEM = "2b2140f2-b9c0-4054-8dfe-2e6bd74cbbbe"
 
 [sources]
 PISP = {rev = "main", url = "https://github.com/ARPST-UniMelb/PISP.jl"}
 PRASNEM = {rev = "main", url = "https://github.com/ARPST-UniMelb/PRASNEM.jl"}
-SiennaNEM = {rev = "main", url = "https://github.com/ARPST-UniMelb/SiennaNEM.jl"}
+SiennaNEM = {rev = "v0.0.1", url = "https://github.com/ARPST-UniMelb/SiennaNEM.jl"}
 
 [compat]
 julia = "1.11"

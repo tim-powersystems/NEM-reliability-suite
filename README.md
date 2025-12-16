@@ -1,24 +1,27 @@
 # NEM Reliability Suite
+
 Data and reliability studies for the Australian National Electricity Market (NEM).
 
 This repository contains some sample data, as well as tutorials and scripts to perform reliability studies with [PISP.jl](https://github.com/ARPST-UniMelb/PISP.jl), [PRASNEM.jl](https://github.com/ARPST-UniMelb/PRASNEM.jl) and [SiennaNEM.jl](https://github.com/ARPST-UniMelb/SiennaNEM.jl).
 
-
 ## Getting started
 
 First, clone the project by executing the following instruction in your command line.
+
 ```sh
 git clone "https://github.com/ARPST-UniMelb/NEM-reliability-suite"
 ```
 
 Then start a Julia REPL within the folder and activate and instantiate the local environment (*note that this requires ```julia 1.11+```*):
+
 ```julia
 using Pkg
 Pkg.activate(".")
 Pkg.instantiate()
 ```
 
-Now we can start collecting the public ISP data with ```PISP```. Note that this requires an active internet connection and may take some time.
+Now we can start collecting the public ISP data with `PISP`. Note that this requires an active internet connection and may take some time.
+
 ```julia
 using PISP
 
@@ -34,12 +37,13 @@ PISP.build_ISP24_datasets(
     years        = target_years,
     output_root  = joinpath(@__DIR__, "..", "data", "pisp-datasets"),
     write_csv    = true,
-    write_arrow  = false,
-    scenarios    = [1,2,3])
-
+    write_arrow  = true,  # using arrow will make SiennaNEM faster
+    scenarios    = [1,2,3]
+)
 ```
 
-Now we have the dataset available in the specified folder. We can therefore now use ```PRASNEM``` to run adequacy studies.
+Now we have the dataset available in the specified folder. We can therefore now use `PRASNEM` to run adequacy studies.
+
 ```julia
 using PRASNEM
 using Dates
@@ -57,41 +61,55 @@ sys_pras          = PRASNEM.create_pras_system(start_dt, end_dt, input_folder, t
 # Run adequacy study using PRAS
 shortfall = PRASNEM.run_pras_study(sys_pras);
 ```
-If more advanced adequacy studies are desired, using PRAS directly is advised. See examples in the folder ```\tutorials```.
 
-To understand the system operation in detail, we utilise ```SiennaNEM``` to run system scheduling.
+If more advanced adequacy studies are desired, using PRAS directly is advised. See examples in the folder `\tutorials`.
+
+To understand the system operation in detail, we utilise `SiennaNEM` to run system scheduling.
+
 ```julia
 using SiennaNEM
+
+using PowerSimulations
+
+using Dates
 using HiGHS
 
-horizon                  = Hour(36)
+horizon                  = Hour(24)
 interval                 = Hour(24)
 simulation_output_folder = joinpath(@__DIR__, "..", "data", "sienna-files")
 simulation_name          = "ref$reference_trace-poe$poe-tyear$tyear-s$scenario"
+simulation_steps         = 2  # number of rolling horizon steps
+input_folder_arrow       = joinpath(@__DIR__, "..", "data", "pisp-datasets","out-ref$reference_trace-poe$poe", "arrow")
+timeseries_folder_arrow  = joinpath(input_folder_arrow, "schedule-$tyear")
 
-data       = SiennaNEM.get_data(input_folder, timeseries_folder);
+
+data       = SiennaNEM.get_data(input_folder_arrow, timeseries_folder_arrow);
 sys_sienna = SiennaNEM.create_system!(data);
 SiennaNEM.add_ts!(
     sys_sienna, data;
     horizon       = horizon,  # horizon of each time slice that will be used in the study
     interval      = interval,  # interval within each time slice, not the resolution of the time series
-    scenario_name = scenario_name,  # scenario number
+    scenario_name = scenario,  # scenario number, integer
 );
 
 template_uc = SiennaNEM.build_problem_base_uc();
 results     = SiennaNEM.run_decision_model_loop(
-                                template_uc, sys_sienna;
-                                simulation_folder     = simulation_output_folder,
-                                simulation_name       = simulation_name,
-                                decision_model_kwargs = (optimizer=optimizer_with_attributes(HiGHS.Optimizer, "mip_rel_gap" => 0.01),),)
-
+    template_uc, sys_sienna;
+    simulation_folder     = simulation_output_folder,
+    simulation_name       = simulation_name,
+    simulation_steps      = simulation_steps,
+    decision_model_kwargs = (
+        optimizer=optimizer_with_attributes(HiGHS.Optimizer, "mip_rel_gap" => 0.01),
+    ),
+)
 ```
-
 
 ## Optional parameters
 
 ### PISP.build_ISP24_datasets()
+
 There are multiple parameters that can be adjusted when generating the dataset from the public ISP24 datafiles:
+
 | Parameter           | Default       | Description                                                                                                                        |
 | ------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 |downloadpath|"../../data-download"| Path where all files from AEMO's website will be downloaded and extracted
@@ -102,12 +120,13 @@ There are multiple parameters that can be adjusted when generating the dataset f
 |output_name|"out"| Output folder name
 |output_root|nothing| Output folder root
 |write_csv|true| Whether to write CSV files
-|write_arrow|true|Whether to write Arrow files 
+|write_arrow|true|Whether to write Arrow files
 |scenarios|[1,2,3]|Scenarios to include in the output: 1 for "Progressive Change", 2 for "Step Change", 3 for "Green Energy Exports"
 
-
 ### PRASNEM.create_pras_system()
+
 There are multiple optional parameters that can be adjusted when creating the pras system:
+
 | Parameter           | Default       | Description                                                                                                                        |
 | ------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | output_folder       | ""            | Folder to save the PRAS file. If empty, the PRAS file is not saved.                                                                |
@@ -121,6 +140,7 @@ There are multiple optional parameters that can be adjusted when creating the pr
 | weather_folder      | ""            | Folder with weather data timeseries to use (no capacities are read from here, only normalised timeseries for demand, VRE, and DSP). Inflows are considered in full (not normalised).|
 
 ## Advanced results
+
 The source code to obtain these results can be found in the folder ``/tutorials``.
 
 **Distribution of USE events of the NEM in 2028**

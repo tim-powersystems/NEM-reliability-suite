@@ -5,29 +5,34 @@ using PowerSimulations
 using Dates
 using HiGHS
 
-# input variables parameters
-schedule_name = "schedule-1w"
-scenario_name = 2
+reference_trace = 4006
+poe = 10
+tyear = 2030
+scenario = 1
 
-# data and system
-data = SiennaNEM.get_data(
-    "data/arrow",
-    joinpath("data/arrow", schedule_name),
-)
-sys = SiennaNEM.create_system!(data)
+horizon = Hour(24)
+interval = Hour(24)
+simulation_output_folder = joinpath(@__DIR__, "..", "data", "sienna-files")
+simulation_name = "ref$reference_trace-poe$poe-tyear$tyear-s$scenario"
+simulation_steps = 2  # number of rolling horizon steps
+input_folder_arrow = joinpath(@__DIR__, "..", "data", "pisp-datasets", "out-ref$reference_trace-poe$poe", "arrow")
+timeseries_folder_arrow = joinpath(input_folder_arrow, "schedule-$tyear")
+
+data = SiennaNEM.get_data(input_folder_arrow, timeseries_folder_arrow);
+sys_sienna = SiennaNEM.create_system!(data);
 SiennaNEM.add_ts!(
-    sys, data;
-    horizon=Hour(24),  # horizon of each time slice
-    interval=Hour(24),  # interval between each time slice step in rolling horizon
-    scenario_name=scenario_name,  # scenario number
-)
+    sys_sienna, data;
+    horizon=horizon,  # horizon of each time slice that will be used in the study
+    interval=interval,  # interval within each time slice, not the resolution of the time series
+    scenario_name=scenario,  # scenario number, integer
+);
 
-# simulation
-template_uc = SiennaNEM.build_problem_base_uc()
+template_uc = SiennaNEM.build_problem_base_uc();
 results = SiennaNEM.run_decision_model_loop(
-    template_uc, sys;
-    simulation_folder="examples/result/simulation_folder",
-    simulation_name="$(schedule_name)_scenario-$(scenario_name)",
+    template_uc, sys_sienna;
+    simulation_folder=simulation_output_folder,
+    simulation_name=simulation_name,
+    simulation_steps=simulation_steps,
     decision_model_kwargs=(
         optimizer=optimizer_with_attributes(HiGHS.Optimizer, "mip_rel_gap" => 0.01),
     ),
