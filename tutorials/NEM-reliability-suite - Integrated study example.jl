@@ -51,16 +51,20 @@ shortfall         = PRASNEM.run_pras_study(sys_pras)
 # =======================================================
 horizon                  = Hour(36)
 interval                 = Hour(24)
+file_format              = "csv"
 simulation_output_folder = joinpath(@__DIR__, "..", "data", "sienna-files")
 simulation_name          = "ref$reference_trace-poe$poe-tyear$tyear-s$scenario"
+simulation_steps         = 2
 
-data       = SiennaNEM.get_data(input_folder, timeseries_folder);
+data       = SiennaNEM.get_data(
+    input_folder, timeseries_folder; file_format=file_format
+)
 sys_sienna = SiennaNEM.create_system!(data);
 SiennaNEM.add_ts!(
     sys_sienna, data;
-    horizon=horizon,         # Horizon of each time slice that will be used in the study
-    interval=interval,       # Interval within each time slice, not the resolution of the time series
-    scenario_name=scenario,  # Scenario number
+    horizon=horizon,    # Horizon of each time slice that will be used in the study
+    interval=interval,  # Interval within each time slice, not the resolution of the time series
+    scenario=scenario,  # Scenario number
 );
 
 template_uc = SiennaNEM.build_problem_base_uc();
@@ -68,4 +72,5 @@ results = SiennaNEM.run_decision_model_loop(
     template_uc, sys_sienna;
     simulation_folder=simulation_output_folder,
     simulation_name=simulation_name,
+    simulation_steps=simulation_steps,
     decision_model_kwargs=(optimizer=JuMP.optimizer_with_attributes(HiGHS.Optimizer, "mip_rel_gap" => 0.01, "log_to_console" => true),),)

@@ -18,6 +18,7 @@ Then start a Julia REPL within the folder and activate and instantiate the local
 using Pkg
 Pkg.activate(".")
 Pkg.instantiate()
+Pkg.update()
 ```
 
 Now we can start collecting the public ISP data with `PISP`. Note that this requires an active internet connection and may take some time.
@@ -79,20 +80,22 @@ interval                 = Hour(24)
 simulation_output_folder = joinpath(@__DIR__, "..", "data", "sienna-files")
 simulation_name          = "ref$reference_trace-poe$poe-tyear$tyear-s$scenario"
 simulation_steps         = 2  # number of rolling horizon steps
-input_folder_arrow       = joinpath(@__DIR__, "..", "data", "pisp-datasets","out-ref$reference_trace-poe$poe", "arrow")
+file_format              = "arrow"
+input_folder_arrow       = joinpath(@__DIR__, "..", "data", "pisp-datasets","out-ref$reference_trace-poe$poe", file_format)
 timeseries_folder_arrow  = joinpath(input_folder_arrow, "schedule-$tyear")
 
-
-data       = SiennaNEM.get_data(input_folder_arrow, timeseries_folder_arrow);
+data       = SiennaNEM.get_data(
+    input_folder_arrow, timeseries_folder_arrow; file_format=file_format
+)
 sys_sienna = SiennaNEM.create_system!(data);
 SiennaNEM.add_ts!(
     sys_sienna, data;
-    horizon       = horizon,  # horizon of each time slice that will be used in the study
-    interval      = interval,  # interval within each time slice, not the resolution of the time series
-    scenario_name = scenario,  # scenario number, integer
-);
+    horizon  = horizon,  # horizon of each time slice that will be used in the study
+    interval = interval,  # interval within each time slice, not the resolution of the time series
+    scenario = scenario,  # scenario number, integer
+)
 
-template_uc = SiennaNEM.build_problem_base_uc();
+template_uc = SiennaNEM.build_problem_base_uc()
 results     = SiennaNEM.run_decision_model_loop(
     template_uc, sys_sienna;
     simulation_folder     = simulation_output_folder,

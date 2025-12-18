@@ -15,7 +15,7 @@ SiennaNEM = "2b2140f2-b9c0-4054-8dfe-2e6bd74cbbbe"
 [sources]
 PISP = {rev = "main", url = "https://github.com/ARPST-UniMelb/PISP.jl"}
 PRASNEM = {rev = "main", url = "https://github.com/ARPST-UniMelb/PRASNEM.jl"}
-SiennaNEM = {rev = "v0.0.1", url = "https://github.com/ARPST-UniMelb/SiennaNEM.jl"}
+SiennaNEM = {rev = "v0.0.3", url = "https://github.com/ARPST-UniMelb/SiennaNEM.jl"}
 
 [compat]
 julia = "1.11"
