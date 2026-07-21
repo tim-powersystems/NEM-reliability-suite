@@ -13,9 +13,9 @@ include(joinpath(@__DIR__, "utils.jl"));
 
 #%%
 
-# Create system for 2035 with reference year 2011 and 2019, with high and low demand
-sys11 = create_system(2035, 2011, 10)
-sys19 = create_system(2035, 2019, 50)
+# Create system for 2035 with two different weather scenarios
+sys11 = create_system(2035, 2011, 10) # This has low VRE availability and high demand
+sys19 = create_system(2035, 2019, 50) # This has high VRE availability and low demand
 show_system_details(sys11)
 show_system_details(sys19)
 
@@ -40,8 +40,8 @@ ev_details_19.annual_demand_mwh .= sum(sys19.regions.load)
 e = vcat(ev_details_11, ev_details_19)
 
 CSV.write(joinpath(@__DIR__, "event_details_2035_2011.csv"), ev_details_11)
-
-e = ev_details_11
+CSV.write(joinpath(@__DIR__, "event_details_2035_2019.csv"), ev_details_19)
+CSV.write(joinpath(@__DIR__, "event_details_2035.csv"), e)
 
 #%% Risk profile plots
 
@@ -57,12 +57,12 @@ kwargs_scatter = (label="", markersize=3, xlabel= "Duration [hrs]",
    size=(350,300), dpi=500)
 
 scatter(e.length, e.sum ./ e.annual_demand_mwh .* 1e6, c=1; kwargs_scatter...)
-#savefig(joinpath(@__DIR__, "figures","risk_profile_2035_2011.png"))
+savefig(joinpath(@__DIR__, "figures","risk_profile_2035.png"))
 
 stephist(e.length, bins=0:1:xlims_overall[2], label="", 
    lw=2, c=1, xlabel="Duration [hrs]", ylabel="Number of events [#/yr]",
    xlims=xlims_overall, xticks=xticks_overall, ylims=(0, 12000),
-   yticks=(0:1000:12000, string.(collect(0:1000:12000) ./ 10000)),
+   yticks=(0:1000:12000, string.(collect(0:1000:12000) ./ 2000)),
    size=(600,300), dpi=500)
 savefig(joinpath(@__DIR__, "figures","stephist_duration.png"))
 
@@ -70,7 +70,7 @@ stephist(e.sum ./ e.annual_demand_mwh .* 1e6, bins=0:5:ylims_overall[2], label="
    lw=2, c=1, xlabel="Event ENS [ppm of annual demand]", ylabel="Number of events [#/yr]",
    #xlims=xlims_overall, xticks=xticks_overall, ylims=(0, 12000),
    xticks=(0:30:150), xlims=(-2, 150), ylims=(0, 25000),
-   yticks=(0:5000:50000, string.(collect(0:5000:50000) ./ 10000)),
+   yticks=(0:5000:50000, string.(collect(0:5000:50000) ./ 2000)),
    size=(600,300), dpi=500)
 savefig(joinpath(@__DIR__, "figures","stephist_ens.png"))
 
