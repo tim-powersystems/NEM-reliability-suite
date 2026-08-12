@@ -17,11 +17,11 @@ SiennaNEM = "2b2140f2-b9c0-4054-8dfe-2e6bd74cbbbe"
 StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 
 [sources]
-PISP = {rev = "main", url = "https://github.com/ARPST-UniMelb/PISP.jl"}
-PRASCore = {rev = "main", subdir = "PRASCore.jl", url = "https://github.com/ARPST-UniMelb/PRAS"}
-PRASNEM = {rev = "main", url = "https://github.com/ARPST-UniMelb/PRASNEM.jl"}
-SchedNEM = {rev = "main", url = "https://github.com/ARPST-UniMelb/SchedNEM.jl"}
-SiennaNEM = {rev = "main", url = "https://github.com/ARPST-UniMelb/SiennaNEM.jl"}
+PISP = {rev = "v0.1.0", url = "https://github.com/ARPST-UniMelb/ParseISP.jl"}
+PRASCore = {rev = "main", subdir = "PRASCore.jl", url = "https://github.com/ARPST-UniMelb/PRAS/tree/main/PRASCore.jl"}
+PRASNEM = {rev = "v0.1.0", url = "https://github.com/ARPST-UniMelb/PRASNEM.jl"}
+SiennaNEM = {rev = "v0.0.8", url = "https://github.com/ARPST-UniMelb/SiennaNEM.jl"}
+SchedNEM = {rev = "v0.1.0", url = "https://github.com/ARPST-UniMelb/SchedNEM.jl"}
 
 [compat]
 julia = "1.11"
